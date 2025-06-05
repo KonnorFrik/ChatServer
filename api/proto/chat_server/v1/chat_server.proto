@@ -28,23 +28,3 @@ service ChatService {
     rpc MessageToChat(chat.MessageToChatRequest) returns (chat.MessageToChatResponse);
     rpc MessageToGroupChat(chat.MessageToGroupChatRequest) returns (chat.MessageToGroupChatResponse);
 }
-
-/*
-◦ Create - ручка создания нового чата. 
-            ▪ Request 
-                • []string usernames
-            ▪ Response 
-                • int64 id
-        ◦ Delete - удаление чата из системы по его идентификатору. 
-            ▪ Request 
-                • int64 id
-            ▪ Response 
-                • empty
-        ◦ SendMessage - ручка отправки сообщения на сервер. 
-            ▪ Request 
-                • string from
-                • string text
-                • Timestamp timestamp
-            ▪ Response 
-                • empty
-*/
