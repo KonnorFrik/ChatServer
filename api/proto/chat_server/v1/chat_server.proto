@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package chat_server.v1;
+option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
+
+import "chat/v1/create_chat_request.proto";
+import "chat/v1/create_chat_response.proto";
+import "chat/v1/create_group_chat_request.proto";
+import "chat/v1/create_group_chat_response.proto";
+
+import "chat/v1/delete_chat_request.proto";
+import "chat/v1/delete_chat_response.proto";
+import "chat/v1/delete_group_chat_request.proto";
+import "chat/v1/delete_group_chat_response.proto";
+
+import "chat/v1/message_to_chat_request.proto";
+import "chat/v1/message_to_chat_response.proto";
+import "chat/v1/message_to_group_chat_request.proto";
+import "chat/v1/message_to_group_chat_response.proto";
+
+service ChatService {
+    rpc CreateChat(chat.CreateChatRequest) returns (chat.CreateChatResponse);
+    rpc CreateGroupChat(chat.CreateGroupChatRequest) returns (chat.CreateGroupChatResponse);
+
+    rpc DeleteChat(chat.DeleteChatRequest) returns (chat.DeleteChatResponse);
+    rpc DeleteGroupChat(chat.DeleteGroupChatRequest) returns (chat.DeleteGroupChatResponse);
+
+    rpc MessageToChat(chat.MessageToChatRequest) returns (chat.MessageToChatResponse);
+    rpc MessageToGroupChat(chat.MessageToGroupChatRequest) returns (chat.MessageToGroupChatResponse);
+}
+
+/*
+◦ Create - ручка создания нового чата. 
+            ▪ Request 
+                • []string usernames
+            ▪ Response 
+                • int64 id
+        ◦ Delete - удаление чата из системы по его идентификатору. 
+            ▪ Request 
+                • int64 id
+            ▪ Response 
+                • empty
+        ◦ SendMessage - ручка отправки сообщения на сервер. 
+            ▪ Request 
+                • string from
+                • string text
+                • Timestamp timestamp
+            ▪ Response 
+                • empty
+*/
