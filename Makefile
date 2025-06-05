@@ -2,6 +2,7 @@ LOCAL_BIN=$(CURDIR)/bin
 PROJECT_NAME=chat_server
 DEFAULT_API_PATH=api/proto
 DEFAULT_PKG_PATH=pkg
+DEFAULT_PROTOLIB_PATH=protolib
 
 _DEFAULT: help
 
@@ -45,7 +46,7 @@ PROTO_OUTPUT_DIR=$(DEFAULT_PKG_PATH)/$(name)/v$(version)
 # generate - generate a gRPC stubs from given $(name)/v$(version) folder
 generate: check_name
 	mkdir -p $(PROTO_OUTPUT_DIR)
-	protoc -I $(PROTO_INPUT_DIR) \
+	protoc -I $(PROTO_INPUT_DIR) -I $(DEFAULT_PROTOLIB_PATH) \
 		--go_out=$(PROTO_OUTPUT_DIR) --go_opt=paths=source_relative \
 		--plugin=protoc-gen-go=bin/protoc-gen-go \
 		--go-grpc_out=$(PROTO_OUTPUT_DIR) --go-grpc_opt=paths=source_relative \
@@ -65,6 +66,17 @@ new:
 	@if [ -z "$(version)" ]; then echo "[!] Please provide a version number for create"; exit 1 ; fi
 	mkdir -p $(PROTO_INPUT_DIR)
 	touch $(PROTO_INPUT_FILE)
+
+
+PROTOLIB_INPUT_DIR=$(DEFAULT_PROTOLIB_PATH)/$(name)/v$(version)
+#PROTOLIB_INPUT_FILE=$(PROTOLIB_INPUT_DIR)/$(name).proto
+
+# lib - create a dirs for new '.proto' lib
+lib:
+	@if [ -z "$(name)" ]; then echo "[!] Please provide a name for create a new lib"; exit 1 ; fi
+	@if [ -z "$(version)" ]; then echo "[!] Please provide a version number for create a new lib"; exit 1 ; fi
+	mkdir -p $(PROTOLIB_INPUT_DIR)
+
 
 help:
 	@echo "'make new name=<string> version=<int>'      : For create a new version of a gRPC proto files"
