@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-package chat_server.v1;
+package user_auth.v1;
 option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
-
 
 import "user/v1/create_user_request.proto";
 import "user/v1/create_user_response.proto";
@@ -19,29 +18,3 @@ service UserService {
     rpc Update(user.UpdateUserRequest) returns (user.UpdateUserResponse);
     rpc Delete(user.DeleteUserRequest) returns (user.DeleteUserResponse);
 }
-
-//service ChatService {
-    //rpc Create(ChatServiceCreateRequest) returns (ChatServiceCreateResponse);
-    //rpc Delete(ChatServiceDeleteRequest) returns (ChatServiceDeleteResponse);
-    //rpc MessageToChat(ChatServiceMessageToChatRequest) returns (ChatServiceMessageToChatRequest);
-//}
-
-/*
-◦ Create - ручка создания нового чата. 
-            ▪ Request 
-                • []string usernames
-            ▪ Response 
-                • int64 id
-        ◦ Delete - удаление чата из системы по его идентификатору. 
-            ▪ Request 
-                • int64 id
-            ▪ Response 
-                • empty
-        ◦ SendMessage - ручка отправки сообщения на сервер. 
-            ▪ Request 
-                • string from
-                • string text
-                • Timestamp timestamp
-            ▪ Response 
-                • empty
-*/
