@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package user;
+option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
+
+import "google/protobuf/wrappers.proto";
+
+message UpdateUserRequest {
+    int64 id = 1;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue email = 3;
+}
+
