@@ -22,12 +22,27 @@ build_server:
 # %: 
 # 	make generate name=$@
 
-
-PROTO_INPUT_DIR=$(DEFAULT_API_PATH)/$(name)
+# api/proto/
+# 	serviceA/
+# 		v1/
+# 			file.proto
+# 		v2/
+# 			file.proto
+# 	serviceB/
+# 		v1/
+# 			file.proto
+# 		v2/
+# 			file.proto
+# name = 'serviceA' or 'serviceB' etc.
+# version = '1' or '2' etc
+# ver = shortened name for 'varsion'
+version=$(ver)
+PROTO_INPUT_DIR=$(DEFAULT_API_PATH)/$(name)/v$(version)
 PROTO_INPUT_FILE=$(PROTO_INPUT_DIR)/$(name).proto
 
-PROTO_OUTPUT_DIR=$(DEFAULT_PKG_PATH)/$(name)
+PROTO_OUTPUT_DIR=$(DEFAULT_PKG_PATH)/$(name)/v$(version)
 
+# generate - generate a gRPC stubs from given $(name)/v$(version) folder
 generate: check_name
 	mkdir -p $(PROTO_OUTPUT_DIR)
 	protoc -I $(PROTO_INPUT_DIR) \
@@ -37,17 +52,20 @@ generate: check_name
 		--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 		$(PROTO_INPUT_FILE)
 
+# check_name - check is vars 'name' and 'version' exists and is 'PROTO_INPUT_DIR' and 'PROTO_INPUT_FILE' exists before generate
 check_name:
-	@if [ -z "$(name)" ]; then echo "[!] Please provide a name for compilation"; exit 1 ; fi
+	@if [ -z "$(name)" ]; then echo "[!] Please provide a name for create"; exit 1 ; fi
+	@if [ -z "$(version)" ]; then echo "[!] Please provide a version number for create"; exit 1 ; fi
 	@if [ ! -d "$(PROTO_INPUT_DIR)" ]; then echo "[!] Dir $(PROTO_INPUT_DIR) is not exist"; exit 1 ; fi
 	@if [ ! -e "$(PROTO_INPUT_FILE)" ]; then echo "[!] File '$(PROTO_INPUT_FILE)' is not exist"; exit 1; fi
 
+# new - create new dir and '.proto' file
 new:
-	@if [ -z "$(name)" ]; then echo "[!] Please provide a name for compilation"; exit 1 ; fi
+	@if [ -z "$(name)" ]; then echo "[!] Please provide a name for create"; exit 1 ; fi
+	@if [ -z "$(version)" ]; then echo "[!] Please provide a version number for create"; exit 1 ; fi
 	mkdir -p $(PROTO_INPUT_DIR)
 	touch $(PROTO_INPUT_FILE)
 
 help:
-	@echo "'make new name=chat_server_X_Y'     : For create a new version of a gRPC proto files"
-	@echo "'make generate name=chat_server_X_Y': For generate a gRPC stub"
-	@echo "     where X - major and Y - minor versions of .proto file"
+	@echo "'make new name=<string> version=<int>'      : For create a new version of a gRPC proto files"
+	@echo "'make generate name=<string> version=<int>' : For generate a gRPC stub"
