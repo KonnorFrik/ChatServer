@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package chat;
-option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
-
-message CreateChatResponse {
-    int64 id = 1;
-}
