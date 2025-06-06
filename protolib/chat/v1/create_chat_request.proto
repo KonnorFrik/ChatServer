@@ -3,5 +3,9 @@ syntax = "proto3";
 package chat;
 option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
 
+// Create a new chat with mode p2p
 message CreateChatRequest {
+    int64 creator_id = 1;
+    int64 participant_id = 2;
+    // TODO: may be added some modes like (realP2P, with message deadline, etc)
 }
