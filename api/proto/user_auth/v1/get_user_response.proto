@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package user;
+option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
+
+import "google/protobuf/timestamp.proto";
+
+import "user_role.proto";
+
+message GetUserResponse {
+    int64 id = 1;
+    string name = 2;
+    string email = 3;
+    role.Role role = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+}

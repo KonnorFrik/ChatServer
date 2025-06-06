@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package chat;
+option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
+
+// Delete any chat: p2p or group
+message DeleteChatRequest {
+    int64 chat_id = 1;
+}

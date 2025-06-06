@@ -3,14 +3,14 @@ syntax = "proto3";
 package user_auth.v1;
 option go_package = "github.com/KonnorFrik/ChatServer;ChatServer";
 
-import "user/v1/create_user_request.proto";
-import "user/v1/create_user_response.proto";
-import "user/v1/get_user_request.proto";
-import "user/v1/get_user_response.proto";
-import "user/v1/update_user_request.proto";
-import "user/v1/update_user_response.proto";
-import "user/v1/delete_user_request.proto";
-import "user/v1/delete_user_response.proto";
+import "create_user_request.proto";
+import "create_user_response.proto";
+import "get_user_request.proto";
+import "get_user_response.proto";
+import "update_user_request.proto";
+import "update_user_response.proto";
+import "delete_user_request.proto";
+import "delete_user_response.proto";
 
 service UserService {
     rpc Create(user.CreateUserRequest) returns (user.CreateUserResponse);
