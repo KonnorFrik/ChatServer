@@ -24,7 +24,7 @@ type DbConfig struct {
     Password string `env:"DB_PASSWORD" env-required`
     DbName string `env:"DB_DBNAME" env-required`
     Port string `env:"DB_PORT" env-required env-default:"5432"`
-    SSLMode bool `env:"DB_SSLMODE" env-default:"disable"`
+    SSLMode string `env:"DB_SSLMODE" env-default:"disable"`
 }
 
 var (
@@ -109,12 +109,6 @@ func (dc *DbConn) connect() error {
 }
 
 func (dc *DbConfig) String() string {
-    sslMode := "disable"
-
-    if dc.SSLMode {
-        sslMode = "enable"
-    }
-
     return fmt.Sprintf(
         "host=%s database=%s user=%s password=%s port=%s sslmode=%s",
         dc.Host,
@@ -122,7 +116,7 @@ func (dc *DbConfig) String() string {
         dc.User,
         dc.Password,
         dc.Port,
-        sslMode,
+        dc.SSLMode,
     )
 }
 
