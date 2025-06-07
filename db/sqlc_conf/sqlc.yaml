@@ -1,0 +1,14 @@
+version: "2"
+sql:
+  - name: "all"
+    engine: "postgresql"
+    schema: "../migrations/"
+    queries: 
+      - "user_queries.sql"
+    gen:
+      go:
+        package: "models"
+        out: "../../pkg/internal/models"
+        sql_package: "pgx/v5"
+        emit_result_struct_pointers: true
+
