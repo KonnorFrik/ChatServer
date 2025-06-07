@@ -9,23 +9,36 @@ package usecase
 
 import (
 	"context"
+	"log"
 
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/db"
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/user"
 
+	"github.com/KonnorFrik/ChatServer/pkg/sql/models"
 	userAuthPb "github.com/KonnorFrik/ChatServer/pkg/user_auth/v1"
 )
 
 func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User, error) {
     var u = new(user.User)
-    err := u.FromGrpcRequest(req)
+    var createParams models.CreateUserParams
 
-    if err != nil {
-        return nil, err
+    if !u.FromGrpcRequest(req).IsValid() {
+        return nil, ErrInvalidData
     }
 
-    db.DB().Queries.CreateUser()
+    if err := u.HashPassword(); err != nil {
+        log.Println("[usecase/CreateUser]: Hash error:", err)
+        return nil, ErrInvalidData
+    }
 
+    u.ToDbCreateParams(&createParams)
+    userDB, err := db.DB().Queries.CreateUser(ctx, createParams)
+
+    if err != nil {
+        return nil, WrapError(db.DB().WrapError(err))
+    }
+
+    u.FromDbModel(userDB)
     return u, nil
 }
 
