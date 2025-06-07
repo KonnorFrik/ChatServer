@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
+
+    "github.com/KonnorFrik/ChatServer/pkg/sql/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -14,6 +15,7 @@ import (
 
 type DbConn struct {
     conn *pgx.Conn
+    *models.Queries
 }
 
 type DbConfig struct {
@@ -101,9 +103,31 @@ func (dc *DbConn) connect() error {
     }
 
     dc.conn = db
-    // dc.Queries = models.New(dc.conn)
+    dc.Queries = models.New(dc.conn)
     log.Println("[db/.connect]: Postgres Connected")
     return nil
+}
+
+func (dc *DbConfig) String() string {
+    sslMode := "disable"
+
+    if dc.SSLMode {
+        sslMode = "enable"
+    }
+
+    return fmt.Sprintf(
+        "host=%s database=%s user=%s password=%s port=%s sslmode=%s",
+        dc.Host,
+        dc.DbName,
+        dc.User,
+        dc.Password,
+        dc.Port,
+        sslMode,
+    )
+}
+
+func (dc *DbConfig) isValid() bool {
+    return dc.Host != "" && dc.User != "" && dc.Password != "" && dc.Port != ""
 }
 
 func wrapError(err error) error {
@@ -136,26 +160,3 @@ func wrapError(err error) error {
 
     return fmt.Errorf("%w: %w", ErrUnknown, err)
 }
-
-func (dc *DbConfig) String() string {
-    sslMode := "disable"
-
-    if dc.SSLMode {
-        sslMode = "enable"
-    }
-
-    return fmt.Sprintf(
-        "host=%s database=%s user=%s password=%s port=%s sslmode=%s",
-        dc.Host,
-        dc.DbName,
-        dc.User,
-        dc.Password,
-        dc.Port,
-        sslMode,
-    )
-}
-
-func (dc *DbConfig) isValid() bool {
-    return dc.Host != "" && dc.User != "" && dc.Password != "" && dc.Port != ""
-}
-
