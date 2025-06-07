@@ -95,3 +95,12 @@ help:
 	@echo "'make generate name=<string> version=<int>' : For generate a gRPC stub"
 	@echo "'make build name=<string> version=<int>'    : For compile gRPC implementation"
 
+
+# This targets may be useless in other project
+
+# generate_sqlc - generate go code from sqlc .yaml config.
+# @sqlc_path: path to dir with sqlc .yaml config file. Default "db/sqlc_conf"
+
+generate_sqlc: sqlc_path=db/sqlc_conf
+generate_sqlc:
+	cd $(sqlc_path) && sqlc generate
