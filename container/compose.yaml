@@ -39,3 +39,12 @@ services:
         limits:
           memory: 1G
           cpus: 4
+
+  go_migrator:
+    build:
+      context: ..
+      dockerfile: ./cmd/migrator/Dockerfile
+    links:
+      - "postgres"
+    depends_on:
+      - postgres

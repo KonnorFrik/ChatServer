@@ -104,3 +104,6 @@ help:
 generate_sqlc: sqlc_path=db/sqlc_conf
 generate_sqlc:
 	cd $(sqlc_path) && sqlc generate
+
+build_migrator:
+	go build -o migrator cmd/migrator/main.go
