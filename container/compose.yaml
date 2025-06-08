@@ -44,7 +44,14 @@ services:
     build:
       context: ..
       dockerfile: ./cmd/migrator/Dockerfile
+    environment:
+        DB_HOST: $DB_HOST
+        DB_USER: $DB_USER
+        DB_PASS: $DB_PASS
+        DB_DB: $DB_DB
+        DB_PORT: $DB_PORT
     links:
       - "postgres"
     depends_on:
       - postgres
+    restart: on-failure
