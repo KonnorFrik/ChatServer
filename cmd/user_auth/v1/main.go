@@ -1,6 +1,5 @@
 /*
 Simple gRPC user_auth server implemented user_auth/v1
-! Used in-memory storage
 */
 package main
 

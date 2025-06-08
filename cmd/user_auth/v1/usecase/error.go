@@ -7,7 +7,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
-	psgs "github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/db"
+	psgs "github.com/KonnorFrik/ChatServer/pkg/db"
 	"log"
 )
 

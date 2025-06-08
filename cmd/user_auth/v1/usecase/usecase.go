@@ -12,7 +12,7 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/db"
+	"github.com/KonnorFrik/ChatServer/pkg/db"
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/user"
 
 	"github.com/KonnorFrik/ChatServer/pkg/logging"
