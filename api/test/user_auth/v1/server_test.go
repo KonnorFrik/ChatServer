@@ -10,7 +10,8 @@ import (
 )
 
 const (
-    raddr = "localhost:9999"
+    // raddr = "localhost:9999"
+    raddr = "0.0.0.0:9999"
 )
 
 var (
