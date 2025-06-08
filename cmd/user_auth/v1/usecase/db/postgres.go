@@ -21,8 +21,8 @@ type DbConn struct {
 type DbConfig struct {
     Host string `env:"DB_HOST" env-required`
     User string `env:"DB_USER" env-required`
-    Password string `env:"DB_PASSWORD" env-required`
-    DbName string `env:"DB_DBNAME" env-required`
+    Password string `env:"DB_PASS" env-required`
+    DbName string `env:"DB_DB" env-required`
     Port string `env:"DB_PORT" env-required env-default:"5432"`
     SSLMode string `env:"DB_SSLMODE" env-default:"disable"`
 }
