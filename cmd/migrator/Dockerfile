@@ -10,6 +10,7 @@ RUN make build_migrator
 FROM golang:1.24-alpine3.21
 
 COPY --from=builder /go/src/migrator /go/bin/
+COPY db/migrations/ /go/db/migrations/
 WORKDIR /go/
 RUN adduser -S user
 USER user
