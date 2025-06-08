@@ -43,7 +43,7 @@ var (
     // ErrUnknown - any other not documented error in db
     ErrUnknown = errors.New("unknown error")
 
-    // Default configuration for connect to postgres container from this repo
+    // Configuration for connect to postgres container from this repo
 	DefaultConfig DbConfig
 
     dbObj DbConn
@@ -116,6 +116,21 @@ func (dc *DbConfig) String() string {
         dc.User,
         dc.Password,
         dc.Port,
+        dc.SSLMode,
+    )
+}
+
+// ToURL - return a URL for connect to postgres.
+// URL format: postgres://user:password@host:port/dbname?query
+//    queries: sslmode
+func (dc *DbConfig) ToURL() string {
+    return fmt.Sprintf(
+        "postgres://%s:%s@%s:%s/%s?sslmode=%s",
+        dc.User,
+        dc.Password,
+        dc.Host,
+        dc.Port,
+        dc.DbName,
         dc.SSLMode,
     )
 }
