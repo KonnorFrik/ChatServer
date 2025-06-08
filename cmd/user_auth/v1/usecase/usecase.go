@@ -10,13 +10,17 @@ package usecase
 import (
 	"context"
 	"log"
+	"log/slog"
 
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/db"
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/user"
 
+	"github.com/KonnorFrik/ChatServer/pkg/logging"
 	"github.com/KonnorFrik/ChatServer/pkg/sql/models"
 	userAuthPb "github.com/KonnorFrik/ChatServer/pkg/user_auth/v1"
 )
+
+var logger = logging.New()
 
 func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User, error) {
     var u = new(user.User)
@@ -35,7 +39,14 @@ func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User,
     userDB, err := db.DB().Queries.CreateUser(ctx, createParams)
 
     if err != nil {
-        return nil, WrapError(db.DB().WrapError(err))
+        er := WrapError(db.DB().WrapError(err))
+        logger.LogAttrs(
+            ctx,
+            slog.LevelError,
+            "[usecase/CreateUser]",
+            slog.String("error", er.Error()),
+        )
+        return nil, er
     }
 
     u.FromDbModel(userDB)
