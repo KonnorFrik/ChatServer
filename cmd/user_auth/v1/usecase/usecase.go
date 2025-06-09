@@ -1,9 +1,7 @@
 /*
 Business logic of user_auth/v1 service
 Work flow:
-
-	convert request into user
-	do job with user and db
+    gRPC request -> User -> DB params -> User -> gRPC response
 */
 package usecase
 
@@ -12,8 +10,8 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/KonnorFrik/ChatServer/pkg/db"
 	"github.com/KonnorFrik/ChatServer/cmd/user_auth/v1/usecase/user"
+	"github.com/KonnorFrik/ChatServer/pkg/db"
 
 	"github.com/KonnorFrik/ChatServer/pkg/logging"
 	"github.com/KonnorFrik/ChatServer/pkg/sql/models"
@@ -26,7 +24,7 @@ func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User,
     var u = new(user.User)
     var createParams models.CreateUserParams
 
-    if !u.FromGrpcRequest(req).IsValid() {
+    if !u.FromGrpcCreateRequest(req).IsValid() {
         return nil, ErrInvalidData
     }
 
@@ -36,7 +34,7 @@ func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User,
     }
 
     u.ToDbCreateParams(&createParams)
-    userDB, err := db.DB().Queries.CreateUser(ctx, createParams)
+    userDB, err := db.DB().CreateUser(ctx, createParams)
 
     if err != nil {
         er := WrapError(db.DB().WrapError(err))
@@ -49,21 +47,84 @@ func Create(ctx context.Context, req *userAuthPb.CreateUserRequest) (*user.User,
         return nil, er
     }
 
-    u.FromDbModel(userDB)
-    return u, nil
+    return u.FromDbModel(userDB), nil
 }
 
 func Get(ctx context.Context, req *userAuthPb.GetUserRequest) (*user.User, error) {
+    var u = new(user.User)
+    u.FromGrpcGetRequest(req)
+    userDB, err := db.DB().UserByID(ctx, u.ID)
 
-    return nil, nil
+    if err != nil {
+        er := WrapError(db.DB().WrapError(err))
+        logger.LogAttrs(
+            ctx,
+            slog.LevelError,
+            "[usecase/GetUser]",
+            slog.String("error", er.Error()),
+        )
+        return nil, er
+    }
+
+    return u.FromDbModel(userDB), nil
 }
 
-func Update(ctx context.Context, req *userAuthPb.UpdateUserRequest) (*user.User, error) {
-    
-    return nil, nil
-}
+func Update(ctx context.Context, req *userAuthPb.UpdateUserRequest) error {
+    var (
+        u = new(user.User)
+        err error
+    )
+    u.FromGrpcUpdateRequest(req)
 
-func Delete(ctx context.Context, req *userAuthPb.DeleteUserRequest) error {
+    switch {
+    case len(u.Name) > 0 && len(u.Email) > 0:
+        var updParams models.UpdateUserNameEmailParams
+        u.ToDbUpdateNameEmailParams(&updParams)
+        err = db.DB().UpdateUserNameEmail(ctx, updParams)
+
+    case len(u.Name) > 0:
+        var updParams models.UpdateUserNameParams
+        u.ToDbUpdateNameParams(&updParams)
+        err = db.DB().UpdateUserName(ctx, updParams)
+
+    case len(u.Email) > 0:
+        var updParams models.UpdateUserEmailParams
+        u.ToDbUpdateEmailParams(&updParams)
+        err = db.DB().UpdateUserEmail(ctx, updParams)
+
+    default:
+        err = ErrDoesNotExist
+    }
+
+    if err != nil {
+        er := WrapError(db.DB().WrapError(err))
+        logger.LogAttrs(
+            ctx,
+            slog.LevelError,
+            "[usecase/UpdateUser]",
+            slog.String("error", er.Error()),
+        )
+        return er
+    }
+
     return nil
 }
 
+func Delete(ctx context.Context, req *userAuthPb.DeleteUserRequest) error {
+    err := db.DB().DeleteUser(ctx, req.Id)
+
+    if err != nil {
+        er := WrapError(db.DB().WrapError(err))
+        logger.LogAttrs(
+            ctx,
+            slog.LevelError,
+            "[usecase/DeleteUser]",
+            slog.String("error", er.Error()),
+        )
+        return er
+    }
+
+    return nil
+}
+
+// TODO: delete may be idempotent - need catch error and if it like Already deleted - return nil
