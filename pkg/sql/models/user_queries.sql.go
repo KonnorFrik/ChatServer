@@ -13,11 +13,11 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    name, email, password, role
+    name, email, password, role, created_at, updated_at
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3, $4, NOW(), NOW()
 )
-RETURNING id, name, email, password, role
+RETURNING id, name, email, password, role, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -41,6 +41,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, 
 		&i.Email,
 		&i.Password,
 		&i.Role,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return &i, err
 }
@@ -57,7 +59,8 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 
 const updateUserEmail = `-- name: UpdateUserEmail :exec
 UPDATE users
-    SET email = $2
+    SET email = $2,
+        updated_at = NOW()
     WHERE id = $1
 `
 
@@ -73,7 +76,8 @@ func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams
 
 const updateUserName = `-- name: UpdateUserName :exec
 UPDATE users
-    SET name = $2
+    SET name = $2,
+        updated_at = NOW()
     WHERE id = $1
 `
 
@@ -90,7 +94,8 @@ func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) 
 const updateUserNameEmail = `-- name: UpdateUserNameEmail :exec
 UPDATE users
     SET name = $2,
-        email = $3
+        email = $3,
+        updated_at = NOW()
     WHERE id = $1
 `
 
@@ -106,7 +111,7 @@ func (q *Queries) UpdateUserNameEmail(ctx context.Context, arg UpdateUserNameEma
 }
 
 const userByID = `-- name: UserByID :one
-SELECT id, name, email, password, role FROM users
+SELECT id, name, email, password, role, created_at, updated_at FROM users
 WHERE id = $1
 `
 
@@ -119,6 +124,8 @@ func (q *Queries) UserByID(ctx context.Context, id int64) (*User, error) {
 		&i.Email,
 		&i.Password,
 		&i.Role,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return &i, err
 }
