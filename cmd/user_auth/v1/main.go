@@ -15,6 +15,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+    jaegerExporter "go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 )
 
 type server struct {
@@ -23,17 +28,43 @@ type server struct {
 
 var (
 	logger = logging.New()
+    tracer *tracesdk.TracerProvider
 )
 
 const (
 	laddr = ":9999"
 )
 
+func NewTracer(url, name string) (*tracesdk.TracerProvider, error) {
+    exp, err := jaegerExporter.New(jaegerExporter.WithCollectorEndpoint(jaegerExporter.WithEndpoint(url)))
+
+    if err != nil {
+        return nil, err
+    }
+
+    tracerObj := tracesdk.NewTracerProvider(
+        tracesdk.WithBatcher(exp),
+        tracesdk.WithResource(resource.NewWithAttributes(
+            semconv.SchemaURL,
+            semconv.ServiceNameKey.String(name),
+        )),
+    )
+
+    return tracerObj, nil
+}
+
 func main() {
+    tracer, err := NewTracer("http://localhost:14268/api/traces", "server")
+
+    if err != nil {
+        logger.Error("[Server/NewTracer]", "error", err)
+    }
+
+    defer tracer.Shutdown(context.Background())
 	listener, err := net.Listen("tcp", laddr)
 
 	if err != nil {
-		logger.Error("Listen", "error", err)
+		logger.Error("[Server/Listen]", "error", err)
 		return
 	}
 
@@ -82,6 +113,9 @@ func (s *server) Create(
 	*userAuthPb.CreateUserResponse,
 	error,
 ) {
+    ctx, span := tracer.Tracer("Server").Start(ctx, "Create")
+    defer span.End()
+
 	var response userAuthPb.CreateUserResponse
 	user, err := usecase.Create(ctx, req)
 
@@ -100,6 +134,9 @@ func (s *server) Get(
     *userAuthPb.GetUserResponse,
     error,
 ) {
+    ctx, span := tracer.Tracer("Server").Start(ctx, "Get")
+    defer span.End()
+
     user, err := usecase.Get(ctx, req)
 
     if err != nil {
@@ -118,6 +155,9 @@ func (s *server) Update(
     *userAuthPb.UpdateUserResponse,
     error,
 ) {
+    ctx, span := tracer.Tracer("Server").Start(ctx, "Update")
+    defer span.End()
+
     err := usecase.Update(ctx, req)
 
     if err != nil {
@@ -135,6 +175,9 @@ func (s *server) Delete(
     *userAuthPb.DeleteUserResponse,
     error,
 ) {
+    ctx, span := tracer.Tracer("Server").Start(ctx, "Delete")
+    defer span.End()
+
     err := usecase.Delete(ctx, req)
 
     if err != nil {

@@ -43,11 +43,24 @@ services:
           memory: 1G
           cpus: 4
     healthcheck:
+      # TODO: fix
+      # this command can't see env vars and spam "role '-d' don't exist"
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 30s
       retries: 5
       start_period: 30s
       timeout: 30s
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "16686:16686" # web iface
+      - "14268:14268" # collector
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: 2
 
   go_migrator:
     build:
