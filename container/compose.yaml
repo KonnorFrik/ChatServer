@@ -2,7 +2,9 @@ name: chat_server
 
 services:
   user_auth:
-    build: ..
+    build:
+      context: ..
+      dockerfile: ./cmd/user_auth/v1/Dockerfile
     environment:
         DB_HOST: $DB_HOST
         DB_USER: $DB_USER
