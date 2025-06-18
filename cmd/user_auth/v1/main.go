@@ -16,10 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	//    jaegerExporter "go.opentelemetry.io/otel/exporters/jaeger"
-	// "go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	// semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 )
 
 type server struct {
