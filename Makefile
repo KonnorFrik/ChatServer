@@ -27,8 +27,6 @@
 
 # Path for local binaries with fixed version for protoc
 LOCAL_BIN=$(CURDIR)/bin
-GEN_GO_VER=1.36.6
-GEN_GO_GRPC_VER=1.5.1
 # Path for store all proto files
 DEFAULT_API_PATH=api/proto
 # Path for store generated output
@@ -36,9 +34,13 @@ DEFAULT_PKG_PATH=pkg
 
 _DEFAULT: help
 
+GEN_GO_VER=1.36.6
+GEN_GO_GRPC_VER=1.5.1
+# SQLC_VER=1.29.0
 install_deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v$(GEN_GO_VER)
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v$(GEN_GO_GRPC_VER)
+	# GOBIN=$(LOCAL_BIN) go install github.com/sqlc-dev/sqlc/cmd/sqlc@v$(SQLC_VER)
 
 # get_deps:
 # 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
@@ -102,8 +104,9 @@ help:
 # @sqlc_path: path to dir with sqlc .yaml config file. Default "db/sqlc_conf"
 
 generate_sqlc: sqlc_path=db/sqlc_conf
+generate_sqlc: sqlc_bin=$(shell pwd)/bin/sqlc
 generate_sqlc:
-	cd $(sqlc_path) && sqlc generate
+	cd $(sqlc_path) && $(sqlc_bin) generate
 
 build_migrator:
 	go build -o migrator cmd/migrator/main.go
